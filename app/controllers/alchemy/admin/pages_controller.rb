@@ -196,15 +196,12 @@ module Alchemy
       end
 
       def flush
-        ids = Language.current.pages.flushables.pluck(:id)
-        Page.where(id: ids).update_all(published_at: Time.now, public: true)
+        Language.current.pages.flushables.update_all(published_at: Time.current)
         # We need to ensure, that also all layoutpages get the +published_at+ timestamp set,
         # but not set to public true, because the cache_key for an element is +published_at+
         # and we don't want the layout pages to be present in +Page.published+ scope.
         # Not the greatest solution, but ¯\_(ツ)_/¯
-        ids = Language.current.pages.flushable_layoutpages.pluck(:id)
-        Page.where(id: ids).update_all(published_at: Time.now)
-
+        Language.current.pages.flushable_layoutpages.update_all(published_at: Time.current)
         respond_to { |format| format.js }
       end
 
